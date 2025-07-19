@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>技术博客 - TechVision</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* 导航栏 */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 15px 0;
+            transition: all 0.3s ease;
+        }
+
+        nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: #4ecdc4;
+        }
+
+        .nav-links a.active {
+            color: #4ecdc4;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: #4ecdc4;
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after,
+        .nav-links a.active::after {
+            width: 100%;
+        }
+
+        /* 主内容区域 */
+        .main-content {
+            padding-top: 100px;
+            min-height: 100vh;
+        }
+
+        .page-header {
+            text-align: center;
+            padding: 80px 0;
+        }
+
+        .page-header h1 {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            animation: fadeInUp 1s ease;
+        }
+
+        .page-header p {
+            font-size: 1.5rem;
+            opacity: 0.8;
+            animation: fadeInUp 1s ease 0.2s both;
+        }
+
+        /* 搜索和分类区域 */
+        .blog-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 60px;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 25px;
+            padding: 12px 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            flex: 1;
+            max-width: 400px;
+        }
+
+        .search-box input {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1rem;
+            width: 100%;
+            outline: none;
+        }
+
+        .search-box input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .search-icon {
+            margin-right: 10px;
+            opacity: 0.6;
+        }
+
+        .category-filter {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .category-btn {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .category-btn:hover,
+        .category-btn.active {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            transform: translateY(-2px);
+        }
+
+        /* 博客文章网格 */
+        .blog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+            padding: 40px 0;
+        }
+
+        .blog-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+        }
+
+        .blog-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .blog-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(45deg, rgba(255, 107, 107, 0.3), rgba(78, 205, 196, 0.3));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .blog-image::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .blog-card:hover .blog-image::before {
+            left: 100%;
+        }
+
+        .blog-content {
+            padding: 30px;
+        }
+
+        .blog-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        .blog-category {
+            color: #4ecdc4;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .blog-date {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .blog-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: white;
+            line-height: 1.3;
+        }
+
+        .blog-excerpt {
+            opacity: 0.8;
+            line-height: 1.6;
+            margin-bottom: 20px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .blog-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .blog-tag {
+            padding: 4px 12px;
+            background: rgba(78, 205, 196, 0.2);
+            border-radius: 15px;
+            font-size: 0.8rem;
+            color: #4ecdc4;
+            border: 1px solid rgba(78, 205, 196, 0.3);
+        }
+
+        .blog-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .read-more {
+            padding: 10px 25px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            color: white;
+            text-decoration: none;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .read-more:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .blog-stats {
+            display: flex;
+            gap: 15px;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        /* 特色文章 */
+        .featured-post {
+            grid-column: 1 / -1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 40px;
+        }
+
+        .featured-image {
+            background: linear-gradient(45deg, rgba(255, 107, 107, 0.4), rgba(78, 205, 196, 0.4));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+            position: relative;
+        }
+
+        .featured-content {
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .featured-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            width: fit-content;
+        }
+
+        .featured-title {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .featured-excerpt {
+            font-size: 1.1rem;
+            opacity: 0.8;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        /* 分页 */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 60px 0;
+        }
+
+        .page-btn {
+            padding: 12px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .page-btn:hover,
+        .page-btn.active {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+        }
+
+        /* 动画 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+
+            .page-header h1 {
+                font-size: 2.5rem;
+            }
+
+            .blog-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-box {
+                max-width: none;
+            }
+
+            .category-filter {
+                justify-content: center;
+            }
+
+            .featured-post {
+                grid-template-columns: 1fr;
+            }
+
+            .featured-title {
+                font-size: 2rem;
+            }
+
+            .blog-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* 滚动条样式 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <!-- 导航栏 -->
+    <nav>
+        <div class="container">
+            <div class="logo">TechVision</div>
+            <ul class="nav-links">
+                <li><a href="index.html">首页</a></li>
+                <li><a href="index.html#features">特性</a></li>
+                <li><a href="about.html">关于</a></li>
+                <li><a href="services.html">服务</a></li>
+                <li><a href="portfolio.html">作品</a></li>
+                <li><a href="blog.html" class="active">博客</a></li>
+                <li><a href="contact.html">联系</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- 主内容 -->
+    <main class="main-content">
+        <!-- 页面头部 -->
+        <section class="page-header">
+            <div class="container">
+                <h1>技术博客</h1>
+                <p>分享最新的技术见解和行业趋势</p>
+            </div>
+        </section>
+
+        <!-- 搜索和分类 -->
+        <section class="controls-section">
+            <div class="container">
+                <div class="blog-controls">
+                    <div class="search-box">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" placeholder="搜索文章..." id="searchInput">
+                    </div>
+                    <div class="category-filter">
+                        <button class="category-btn active" data-category="all">全部</button>
+                        <button class="category-btn" data-category="frontend">前端</button>
+                        <button class="category-btn" data-category="backend">后端</button>
+                        <button class="category-btn" data-category="ai">人工智能</button>
+                        <button class="category-btn" data-category="cloud">云计算</button>
+                        <button class="category-btn" data-category="mobile">移动开发</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 博客文章 -->
+        <section class="blog-section">
+            <div class="container">
+                <div class="blog-grid">
+                    <!-- 特色文章 -->
+                    <article class="featured-post" data-category="ai">
+                        <div class="featured-image">🤖</div>
+                        <div class="featured-content">
+                            <span class="featured-badge">特色文章</span>
+                            <h2 class="featured-title">AI驱动的未来：机器学习在企业中的应用</h2>
+                            <p class="featured-excerpt">探索人工智能如何改变现代企业的运营方式，从自动化流程到智能决策支持，AI正在重塑商业格局。本文深入分析了机器学习技术在不同行业中的实际应用案例。</p>
+                            <div class="blog-meta">
+                                <span class="blog-category">人工智能</span>
+                                <span class="blog-date">📅 2024年1月15日</span>
+                            </div>
+                            <div class="blog-footer">
+                                <a href="#" class="read-more">阅读全文</a>
+                                <div class="blog-stats">
+                                    <span class="stat-item">👁️ 1,234</span>
+                                    <span class="stat-item">💬 28</span>
+                                    <span class="stat-item">❤️ 156</span>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- 普通文章 -->
+                    <article class="blog-card" data-category="frontend">
+                        <div class="blog-image">⚛️</div>
+                        <div class="blog-content">
+                            <div class="blog-meta">
+                                <span class="blog-category">前端开发</span>
+                                <span class="blog-date">📅 2024年1月12日</span>
+                            </div>
+                            <h3 class="blog-title">React 18新特性深度解析</h3>
+                            <p class="blog-excerpt">React 18带来了许多令人兴奋的新特性，包括并发渲染、自动批处理和新的Hooks。本文将详细介绍这些特性如何提升应用性能。</p>
+                            <div class="blog-tags">
+                                <span class="blog-tag">React</span>
+                                <span class="blog-tag">JavaScript</span>
+                                <span class="blog-tag">前端</span>
+                            </div>
+                            <div class="blog-footer">
+                                <a href="#" class="read-more">阅读更多</a>
+                                <div class="blog-stats">
+                                    <span class="stat-item">👁️ 892</span>
+                                    <span class="stat-item">💬 15</span>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="blog-card" data-category="backend">
+                        <div class="blog-image">🐍</div>
+                        <div class="blog-content">
+                            <div class="blog-meta">
+                                <span class="blog-category">后端开发</span>
+                                <span class="blog-date">📅 2024年1月10日</span>
+                            </div>
+                            <h3 class="blog-title">Python异步编程最佳实践</h3>
+                            <p class="blog-excerpt">深入探讨Python中的异步编程模式，包括asyncio、协程和事件循环的使用技巧，帮助开发者构建高性能的后端应用。</p>
+                            <div class="blog-tags">
+                                <span class="blog-tag">Python</span>
+                                <span class="blog-tag">异步编程</span>
+                                <span class="blog-tag">性能优化</span>
+                            </div>
+                            <div class="blog-footer">
+                                <a href="#" class="read-more">阅读更多</a>
+                                <div class="blog-stats">
+                                    <span class="stat-item">👁️ 756</span>
+                                    <span class="stat-item">💬 22</span>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="blog-card" data-category="cloud">
+                        <div class="blog-image">☁️</div>
+                        <div class="blog-content">
+                            <div class="blog-meta">
+                                <span class="blog-category">云计算</span>
+                                <span class="blog-date">📅 2024年1月8日</span>
+                            </div>
+                            <h3 class="blog-title">Kubernetes集群管理进阶指南</h3>
+                            <p class="blog-excerpt">从基础概念到高级配置，全面介绍Kubernetes集群的管理技巧，包括资源调度、服务发现和故障排除等关键主题。</p>
+                            <div class="blog-tags">
+                                <span class="blog-tag">Kubernetes</span>
+                                <span class="blog-tag">DevOps</span>
+                                <span class="blog-tag">容器化</span>
+                            </div>
+                            <div class="blog-footer">
+                                <a href="#" class="read-more">阅读更多</a>
+                                <div class="blog-stats">
+                                    <span class="stat-item">👁️ 643</span>
+                                    <span class="stat-item">💬 18</span>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="blog-card" data-category="mobile">
+                        <div class="blog-image">📱</div>
+                        <div class="blog-content">
+                            <div class="blog-meta">
+                                <span class="blog-category">移动开发</span>
+                                <span class="blog-date">📅 2024年1月5日</span>
+                            </div>
+                            <h3 class="blog-title">Flutter vs React Native：2024年对比</h3>
+                            <p class="blog-excerpt">详细比较两大跨平台移动开发框架的优缺点，帮助开发者根据项目需求选择最适合的技术栈。</p>
+                            <div class="blog-tags">
+                                <span class="blog-tag">Flutter</span>
+                                <span class="blog-tag">React Native</span>
+                                <span class="blog-tag">跨平台</span>
+                            </div>
+                            <div class="blog-footer">
+                                <a href="#" class="read-more">阅读更多</a>
+                                <div class="blog-stats">
+                                    <span class="stat-item">👁️ 1,089</span>
+                                    <span class="stat-item">💬 35</span>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="blog-card" data-category="frontend">
+                        <div class="blog-image">🎨</div>
+                        <div class="blog-content">
+                            <div class="blog-meta">
+                                <span class="blog-category">前端开发</span>
+                                <span class="blog-date">📅 2024年1月3日</span>
+                            </div>
+                            <h3 class="blog-title">CSS Grid与Flexbox布局技巧</h3>
+                            <p class="blog-excerpt">掌握现代CSS布局技术，通过实际案例学习如何使用Grid和Flexbox创建响应式和灵活的网页布局。</p>
+                            <div class="blog-tags">
+                                <span class="blog-tag">CSS</span>
+                                <span class="blog-tag">布局</span>
+                                <span class="blog-tag">响应式</span>
+                            </div>
+                            <div class="blog-footer">
+                                <a href="#" class="read-more">阅读更多</a>
+                                <div class="blog-stats">
+                                    <span class="stat-item">👁️ 567</span>
+                                    <span class="stat-item">💬 12</span>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="blog-card" data-category="ai">
+                        <div class="blog-image">🧠</div>
+                        <div class="blog-content">
+                            <div class="blog-meta">
+                                <span class="blog-category">人工智能</span>
+                                <span class="blog-date">📅 2024年1月1日</span>
+                            </div>
+                            <h3 class="blog-title">深度学习模型部署实战</h3>
+                            <p class="blog-excerpt">从训练到生产环境部署，详细介绍深度学习模型的完整生命周期管理，包括模型优化和监控策略。</p>
+                            <div class="blog-tags">
+                                <span class="blog-tag">深度学习</span>
+                                <span class="blog-tag">模型部署</span>
+                                <span class="blog-tag">MLOps</span>
+                            </div>
+                            <div class="blog-footer">
+                                <a href="#" class="read-more">阅读更多</a>
+                                <div class="blog-stats">
+                                    <span class="stat-item">👁️ 923</span>
+                                    <span class="stat-item">💬 27</span>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+
+                <!-- 分页 -->
+                <div class="pagination">
+                    <button class="page-btn">‹ 上一页</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn">2</button>
+                    <button class="page-btn">3</button>
+                    <button class="page-btn">下一页 ›</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // 分类筛选功能
+        const categoryButtons = document.querySelectorAll('.category-btn');
+        const blogCards = document.querySelectorAll('.blog-card, .featured-post');
+
+        categoryButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // 移除所有按钮的active类
+                categoryButtons.forEach(btn => btn.classList.remove('active'));
+                // 添加当前按钮的active类
+                button.classList.add('active');
+
+                const category = button.getAttribute('data-category');
+
+                blogCards.forEach(card => {
+                    if (category === 'all' || card.getAttribute('data-category') === category) {
+                        card.style.display = 'block';
+                        card.style.animation = 'fadeInUp 0.6s ease forwards';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // 搜索功能
+        const searchInput = document.getElementById('searchInput');
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            
+            blogCards.forEach(card => {
+                const title = card.querySelector('.blog-title, .featured-title').textContent.toLowerCase();
+                const excerpt = card.querySelector('.blog-excerpt, .featured-excerpt').textContent.toLowerCase();
+                const tags = Array.from(card.querySelectorAll('.blog-tag')).map(tag => tag.textContent.toLowerCase());
+                
+                const isMatch = title.includes(searchTerm) || 
+                               excerpt.includes(searchTerm) || 
+                               tags.some(tag => tag.includes(searchTerm));
+                
+                if (isMatch || searchTerm === '') {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // 导航栏滚动效果
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 100) {
+                nav.style.background = 'rgba(0, 0, 0, 0.95)';
+            } else {
+                nav.style.background = 'rgba(0, 0, 0, 0.9)';
+            }
+        });
+
+        // 元素动画观察器
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animation = 'fadeInUp 0.6s ease forwards';
+                }
+            });
+        }, observerOptions);
+
+        // 观察所有需要动画的元素
+        document.querySelectorAll('.blog-card, .featured-post').forEach(element => {
+            observer.observe(element);
+        });
+
+        // 分页功能
+        const pageButtons = document.querySelectorAll('.page-btn');
+        pageButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                if (!button.textContent.includes('上一页') && !button.textContent.includes('下一页')) {
+                    pageButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                }
+            });
+        });
+
+        // 博客卡片悬停效果增强
+        document.querySelectorAll('.blog-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-15px) scale(1.02)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+    </script>
+</body>
+</html>
